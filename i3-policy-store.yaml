@@ -1,0 +1,830 @@
+openapi: 3.0.1
+info:
+  title: Policy Store
+  version: "1.0"
+servers:
+  - url: http://localhost/PolicyStore/v1
+paths:
+  /Policies:
+    get:
+      tags:
+        - RetrievePolicy, UpdatedPolicy
+      summary: Retrieves all policies from the store. Use limit and start parameters for pagination.
+      operationId: RetrievePolicy
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: start
+          in: query
+          description: First item in the page of results, as an ordinal 1-based integer
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - name: policyOwner
+          in: query
+          description: ID of the Agency owning policy(ies)
+          required: false
+          schema:
+            type: string
+        - name: policyType
+          in: query
+          description: Type of the policy
+          required: false
+          schema:
+            type: string
+        - name: policyQueueName
+          in: query
+          description: Policy queue name
+          required: false
+          schema:
+            type: string
+            format: uri
+        - name: policyId
+          in: query
+          description: Id of the policy
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policies found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyArray'
+        '307':
+          description: Temporary Redirect
+          headers:
+            Location:
+              description: Referral URI of another Policy Store which may store the policy requested
+              schema:
+                type: string
+        '404':
+          description: Not found
+        '451':
+          description: Unknown or bad Policy Type
+        '452':
+          description: Unknown or bad Agency Name
+        '453':
+          description: Not available here, no referral available
+        '454':
+          description: Unspecified Error
+    post:
+      tags:
+        - CreatePolicy
+      summary: Creates a new policy in the Policy Store
+      operationId: CreatePolicy
+      requestBody:
+        description: Policy to add (JWS using flattened JSON serialization)
+        content:
+          application/json:
+            schema:
+              $ref: 'i3-common.yaml#/components/schemas/Jws'
+        required: true
+      responses:
+        '201':
+          description: Policy successfully created
+        '434':
+          description: Signature Verification Failure
+        '436':
+          description: Duplicate or Invalid Priority
+        '437':
+          description: Bad Policy Structure
+        '438':
+          description: Unacceptable Algorithm
+        '451':
+          description: Unknown or bad Policy Type
+        '452':
+          description: Unknown or bad Agency Name
+        '454':
+          description: Unspecified Error
+        '459':
+          description: Bad policyExpirationTime
+    put:
+      tags:
+        - UpdatePolicy
+      summary: Updates an existing policy. In order to identify a policy the following parameters must be specified - policyType, policyQueueName OR policyId.
+      operationId: UpdatePolicy
+      parameters:
+        - name: policyOwner
+          in: query
+          description: Owner of the policy
+          required: true
+          schema:
+            type: string
+        - name: policyType
+          in: query
+          description: Type of the policy
+          required: true
+          schema:
+            type: string
+        - name: policyQueueName
+          in: query
+          description: Policy queue name
+          required: false
+          schema:
+            type: string
+            format: uri
+        - name: policyId
+          in: query
+          description: Id of the policy
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Policy to update (JWS using flattened JSON serialization)
+        content:
+          application/json:
+            schema:
+              $ref: 'i3-common.yaml#/components/schemas/Jws'
+        required: true
+      responses:
+        '200':
+          description: Policy successfully updated
+        '404':
+          description: Not found
+        '434':
+          description: Signature Verification Failure
+        '436':
+          description: Duplicate or Invalid Priority
+        '437':
+          description: Bad Policy Structure
+        '451':
+          description: Unknown or bad Policy Type
+        '452':
+          description: Unknown or bad Agency Name
+        '454':
+          description: Unspecified Error
+        '460':
+          description: Bad PolicyExpirationTime
+    delete:
+      tags:
+        - DeletePolicy
+      summary: Deletes an existing policy. In order to identify a policy the following parameters must be specified - policyType, policyQueueName OR policyId.
+      operationId: DeletePolicy
+      parameters:
+        - name: policyOwner
+          in: query
+          description: Owner of the policy
+          required: true
+          schema:
+            type: string
+        - name: policyType
+          in: query
+          description: Type of the policy
+          required: true
+          schema:
+            type: string
+        - name: policyQueueName
+          in: query
+          description: Policy queue name
+          required: false
+          schema:
+            type: string
+            format: uri
+        - name: policyId
+          in: query
+          description: Id of the policy
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy successfully deleted
+        '404':
+          description: Not found
+        '451':
+          description: Unknown or bad Policy Type
+        '452':
+          description: Unknown or bad Agency Name
+        '454':
+          description: Unspecified Error
+  /PolicyEnums:
+    get:
+      tags:
+        - EnumeratePolicy
+      summary: Returns a list of policy types available in the store for a specific agency/service. Use limit and start parameters for pagination.
+      operationId: EnumeratePolicy
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: start
+          in: query
+          description: First item in the page of results, as an ordinal 1-based integer
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+        - name: policyOwner
+          in: query
+          description: ID of the Agency owning policy(ies)
+          required: false
+          schema:
+            type: string
+        - name: policyType
+          in: query
+          description: Type of the policy
+          required: true
+          schema:
+            type: string
+        - name: policyQueueName
+          in: query
+          description: Policy queue name
+          required: false
+          schema:
+            type: string
+            format: uri
+        - name: policyId
+          in: query
+          description: Id of the policy
+          required: false
+          schema:
+            type: string
+        - name: policiesUpdatedSince
+          in: query
+          description: The query will return all policies having the time of creation or last modification greater than policiesUpdatedSince
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2020-03-10T10:00:00-05:00'
+      responses:
+        '200':
+          description: Policies enumerations found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyEnumArray'
+        '404':
+          description: Not found
+        '451':
+          description: Unknown or bad Policy Type
+        '452':
+          description: Unknown or bad Agency Name
+        '454':
+          description: Unspecified Error
+  /Versions:
+    servers:
+      - url: https://api.example.com/PolicyStore
+        description: Override base path for Versions query
+    get:
+      tags:
+        - RetrieveVersions
+      summary: Retrieves all supported versions, vendor parameter is optional.
+      operationId: RetrieveVersions
+      responses:
+        '200':
+          description: Versions found
+          content:
+            application/json:
+              schema:
+                $ref: 'i3-common.yaml#/components/schemas/VersionsArray'
+components:
+  schemas:
+    PolicyArray:
+      type: object
+      required:
+        - count
+        - totalCount
+        - policies
+      properties:
+        count:
+          type: integer
+          format: int32
+          description: Number of items in the array
+        totalCount:
+          type: integer
+          format: int32
+          description: Total number of items found
+        policies:
+          type: array
+          items:
+            $ref: 'i3-common.yaml#/components/schemas/Jws'
+          description: Array of Policy objects, each in JWS format (JWS using flattened JSON serialization)
+    Policy:
+      type: object
+      required:
+        - policyType
+        - policyOwner
+        - policyRules
+      properties:
+        policyType:
+          type: string
+          description: Values limited to those in the policyType registry
+        policyOwner:
+          type: string
+        policyQueueName:
+          type: string
+          format: uri
+        policyId:
+          type: string
+        policyExpirationTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        policyRules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+        policyLastModificationTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        description:
+          type: string
+    PolicyEnumArray:
+      type: object
+      required:
+        - count
+        - totalCount
+        - policyEnums
+      properties:
+        count:
+          type: integer
+          format: int32
+          description: Number of items in the array
+        totalCount:
+          type: integer
+          format: int32
+          description: Total number of items found
+        policyEnums:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyEnum'
+          description: Array of Policy Enums objects
+    PolicyEnum:
+      type: object
+      required:
+        - policyType
+        - policyOwner
+        - policyExpirationTime
+        - policyLastModificationTime
+      properties:
+        policyType:
+          type: string
+        policyOwner:
+          type: string
+        policyQueueName:
+          type: string
+          format: uri
+        policyId:
+          type: string
+        policyExpirationTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+        policyLastModificationTime:
+          type: string
+          format: date-time
+          example: '2020-03-10T10:00:00-05:00'
+    Rule:
+      type: object
+      required:
+        - id
+        - priority
+        - actions
+      properties:
+        id:
+          type: string
+          description: Unique ID within a Policy,
+        priority:
+          type: integer
+          format: int32
+          minimum: 0
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+        description:
+          type: string
+    Action:
+      type: object
+      required:
+        - actionType
+      properties:
+        actionType:
+          type: string
+          enum: [RouteAction, NotifyAction, LogAction, BusyAction, InvokePolicyAction]
+        description:
+          type: string
+      discriminator:
+        propertyName: actionType
+    RouteAction:
+      allOf:
+        - $ref: '#/components/schemas/Action'
+        - type: object
+          required:
+            - recipientUri
+          properties:
+            recipientUri:
+              type: string
+              format: uri
+            rnaTimer:
+              type: integer
+              format: int32
+            cause:
+              type: string
+    NotifyAction:
+      allOf:
+        - $ref: '#/components/schemas/Action'
+        - type: object
+          required:
+            - eventCode
+            - urgency
+          properties:
+            recipient:
+              type: string
+              format: uri
+            eventCode:
+              type: string
+              description: Values limited to those in the EsrpNotifyEventCodes registry
+            urgency:
+              type: integer
+              format: int32
+            comment:
+              type: string
+    BusyAction:
+      allOf:
+        - $ref: '#/components/schemas/Action'
+    LogAction:
+      allOf:
+        - $ref: '#/components/schemas/Action'
+        - type: object
+          required:
+            - message
+          properties:
+            message:
+              type: string
+    InvokePolicyAction:
+      allOf:
+        - $ref: '#/components/schemas/Action'
+        - type: object
+          required:
+            - policyType
+          properties:
+            policyType:
+              type: string
+            policyQueueName:
+              type: string
+              format: uri
+            policyId:
+              type: string
+    Condition:
+      type: object
+      required:
+        - conditionType
+      properties:
+        conditionType:
+          $ref: 'i3-common.yaml#/components/schemas/ConditionType'
+        negation:
+          type: boolean
+        description:
+          type: string
+      discriminator:
+        propertyName: conditionType
+    TimePeriodCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - dateStart
+            - dateEnd
+          properties:
+            dateStart:
+              type: string
+              format: date-time
+              example: '2019-11-04T02:00:00-05:00'
+            dateEnd:
+              type: string
+              format: date-time
+              example: '2020-03-10T01:59:59-05:00'
+            timeStart:
+              type: string
+              example: '08:00:00'
+            timeEnd:
+              type: string
+              example: '18:00:00'
+            weekdayList:
+              type: string
+              example: 'MO,TU,WE,TH,FR'
+    SipHeaderCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - field
+            - operator
+            - content
+          properties:
+            field:
+              type: string
+            operator:
+              type: string
+              enum: [EQ, SS, IS]
+            content:
+              type: string
+    AdditionalDataCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - type
+            - operator
+          properties:
+            type:
+              type: string
+            element:
+              type: string
+            operator:
+              type: string
+              enum: [exists, missing, EQ, SS, NE, GT, LT, GE, LE]
+            content:
+              type: string
+    MimeBodyCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - mimeList
+          properties:
+            mimeList:
+              type: array
+              items:
+                type: string
+    LocationCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - location
+          properties:
+            location:
+              type: object
+              required:
+                - lo
+                - profile
+                - label
+                - lang
+              properties:
+                lo:
+                  type: string
+                profile:
+                  type: string
+                  enum: [civic, geodetic]
+                label:
+                  type: string
+                lang:
+                  type: string
+                extension:
+                  type: object
+            extension:
+              type: object
+    CallSuspicionCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - scoreFrom
+            - scoreTo
+          properties:
+            scoreFrom:
+              type: integer
+              format: int32
+            scoreTo:
+              type: integer
+              format: int32
+    SecurityPostureCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - service
+            - condition
+            - value
+          properties:
+            service:
+              type: string
+            condition:
+              type: string
+              enum: [EQ, NE]
+            value:
+              type: string
+              description: Values limited to those in the SecurityPosture registry
+    QueueStateCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - queue
+            - condition
+            - value
+          properties:
+            queue:
+              type: string
+              format: uri
+            condition:
+              type: string
+              enum: [EQ, NE]
+            value:
+              type: string
+              description: Values limited to those in the QueueState registry
+    LostServiceUrnCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - urn
+          properties:
+            urn:
+              type: string
+    ServiceStateCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - service
+            - condition
+            - value
+          properties:
+            service:
+              type: string
+            condition:
+              type: string
+              enum: [EQ, NE]
+            value:
+              type: string
+              description: Values limited to those in the serviceState registry
+    CallSourceCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - operator
+            - content
+          properties:
+            operator:
+              type: string
+              enum: [EQ, SS, NE]
+            content:
+              type: string
+    BodyPartCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - contentType
+            - element
+            - operator
+            - content
+          properties:
+            contentType:
+              type: string
+            element:
+              type: string
+            operator:
+              type: string
+              enum: [EQ, SS, NE, GT, LT, GE, LE, exists, missing]
+            content:
+              type: string
+    RequestUriCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - operator
+            - content
+          properties:
+            operator:
+              type: string
+              enum: [EQ, SS, NE]
+            content:
+              type: string
+    NormalNextHopCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - operator
+            - content
+          properties:
+            operator:
+              type: string
+              enum: [EQ, SS, NE]
+            content:
+              type: string
+    IncomingQueueCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - operator
+            - content
+          properties:
+            operator:
+              type: string
+              enum: [EQ, SS, NE]
+            content:
+              type: string
+              format: uri
+    SdpOfferCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          properties:
+            video:
+              type: boolean
+            audio:
+              type: boolean
+            rtt:
+              type: boolean
+            im:
+              type: boolean
+            text:
+              type: boolean
+            langVideo:
+              type: array
+              items:
+                type: string
+            langAudio:
+              type: array
+              items:
+                type: string
+            langRtt:
+              type: array
+              items:
+                type: string
+            langIm:
+              type: array
+              items:
+                type: string
+            langText:
+              type: array
+              items:
+                type: string
+            langVideoPref:
+              $ref: '#/components/schemas/Pref'
+            langAudioPref:
+              $ref: '#/components/schemas/Pref'
+            langRttPref:
+              $ref: '#/components/schemas/Pref'
+            langImPref:
+              $ref: '#/components/schemas/Pref'
+            langTextPref:
+              $ref: '#/components/schemas/Pref'
+    CapCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - tag
+          properties:
+            tag:
+              type: string
+              enum: [Identifier, Sender, Address, InfoEventCode, InfoValueName]
+            operator:
+              type: string
+              enum: [EQ, SS, NE]
+            content:
+              type: string
+            nonInteractive:
+              type: boolean
+    CallingNumberVerificationStatusCondition:
+      allOf:
+        - $ref: '#/components/schemas/Condition'
+        - type: object
+          required:
+            - operator
+            - content
+          properties:
+            operator:
+              type: string
+              enum: [EQ, NE]
+            content:
+              type: string
+    Pref:
+      type: object
+      required:
+        - langList
+        - langTest
+      properties:
+        langList:
+          type: string
+        langTest:
+          type: string
