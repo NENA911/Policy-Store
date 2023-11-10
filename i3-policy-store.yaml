@@ -54,7 +54,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Policies found
+          description: Policies Found
           content:
             application/json:
               schema:
@@ -67,13 +67,13 @@ paths:
               schema:
                 type: string
         '404':
-          description: Not found
+          description: Not Found
         '451':
-          description: Unknown or bad Policy Type
+          description: Unknown Or Bad Policy Type
         '452':
-          description: Unknown or bad Agency Name
+          description: Unknown Or bad Agency Name
         '453':
-          description: Not available here, no referral available
+          description: Not Available Here, No Referral Available
         '454':
           description: Unspecified Error
     post:
@@ -90,23 +90,23 @@ paths:
         required: true
       responses:
         '201':
-          description: Policy successfully created
+          description: Policy Successfully Created
         '434':
           description: Signature Verification Failure
         '436':
-          description: Duplicate or Invalid Priority
+          description: Duplicate Or Invalid Priority
         '437':
           description: Bad Policy Structure
         '438':
           description: Unacceptable Algorithm
         '451':
-          description: Unknown or bad Policy Type
+          description: Unknown Or Bad Policy Type
         '452':
-          description: Unknown or bad Agency Name
+          description: Unknown Or Bad Agency Name
         '454':
           description: Unspecified Error
         '459':
-          description: Bad policyExpirationTime
+          description: Bad Policy Expiration Time
     put:
       tags:
         - UpdatePolicy
@@ -147,23 +147,23 @@ paths:
         required: true
       responses:
         '200':
-          description: Policy successfully updated
+          description: Policy Successfully Updated
         '404':
-          description: Not found
+          description: Not Found
         '434':
           description: Signature Verification Failure
         '436':
-          description: Duplicate or Invalid Priority
+          description: Duplicate Or Invalid Priority
         '437':
           description: Bad Policy Structure
         '451':
-          description: Unknown or bad Policy Type
+          description: Unknown Or Bad Policy Type
         '452':
-          description: Unknown or bad Agency Name
+          description: Unknown Or Bad Agency Name
         '454':
           description: Unspecified Error
-        '460':
-          description: Bad PolicyExpirationTime
+        '459':
+          description: Bad Policy Expiration Time
     delete:
       tags:
         - DeletePolicy
@@ -197,13 +197,13 @@ paths:
             type: string
       responses:
         '200':
-          description: Policy successfully deleted
+          description: Policy Successfully Deleted
         '404':
-          description: Not found
+          description: Not Found
         '451':
-          description: Unknown or bad Policy Type
+          description: Unknown Or Bad Policy Type
         '452':
-          description: Unknown or bad Agency Name
+          description: Unknown Or Bad Agency Name
         '454':
           description: Unspecified Error
   /PolicyEnums:
@@ -263,17 +263,17 @@ paths:
             example: '2020-03-10T10:00:00-05:00'
       responses:
         '200':
-          description: Policies enumerations found
+          description: Policies Enumerations Found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PolicyEnumArray'
         '404':
-          description: Not found
+          description: Not Found
         '451':
-          description: Unknown or bad Policy Type
+          description: Unknown Or Bad Policy Type
         '452':
-          description: Unknown or bad Agency Name
+          description: Unknown Or Bad Agency Name/Service Name
         '454':
           description: Unspecified Error
   /Versions:
@@ -287,7 +287,7 @@ paths:
       operationId: RetrieveVersions
       responses:
         '200':
-          description: Versions found
+          description: Versions Found
           content:
             application/json:
               schema:
