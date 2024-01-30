@@ -237,7 +237,7 @@ paths:
         - name: policyType
           in: query
           description: Type of the policy
-          required: true
+          required: false
           schema:
             type: string
         - name: policyQueueName
@@ -467,8 +467,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/Action'
         - type: object
-          required:
-            - message
           properties:
             message:
               type: string
@@ -580,8 +578,6 @@ components:
               required:
                 - lo
                 - profile
-                - label
-                - lang
               properties:
                 lo:
                   type: string
