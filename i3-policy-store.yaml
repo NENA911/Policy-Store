@@ -690,9 +690,7 @@ components:
         - type: object
           required:
             - contentType
-            - element
             - operator
-            - content
           properties:
             contentType:
               type: string
