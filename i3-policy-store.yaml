@@ -793,18 +793,30 @@ components:
         - $ref: '#/components/schemas/Condition'
         - type: object
           required:
-            - tag
+            - tests
           properties:
-            tag:
-              type: string
-              enum: [Identifier, Sender, Address, InfoEventCode, InfoValueName]
-            operator:
-              type: string
-              enum: [EQ, SS, NE]
-            content:
-              type: string
+            tests:
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/CapConditionTest'
             nonInteractive:
               type: boolean
+    CapConditionTest:
+      type: object
+      required:
+        - tag
+        - operator
+        - content
+      properties:
+        tag:
+          type: string
+          enum: [Identifier, Sender, Address, InfoEventCode, InfoValueName]
+        operator:
+          type: string
+          enum: [EQ, SS, NE]
+        content:
+          type: string
     CallingNumberVerificationStatusCondition:
       allOf:
         - $ref: '#/components/schemas/Condition'
